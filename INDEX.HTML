@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Botonera Smart Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Estilos -->
+    <style>
+        /* Estilos generales */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ece5dd00;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: #303030;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #075E54;
+            color: #fff;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .categories {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin: 20px 0;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .category {
+            flex: 0 0 auto;
+            margin: 0 10px;
+            padding: 8px 16px;
+            background-color: #25D366;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .category.active {
+            background-color: #128C7E;
+        }
+
+        .products {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .products.active {
+            display: flex;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 20px;
+            width: 220px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            color: #075E54;
+        }
+
+        .product-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .product-card h3 {
+            margin: 10px 0 5px;
+            font-size: 20px;
+        }
+
+        .product-card p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .product-card textarea,
+        .product-card input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .product-card button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #25D366;
+            color: #fff;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .product-card button:hover {
+            background-color: #1DA851;
+        }
+
+        .cart {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25D366;
+            color: #fff;
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .cart:hover {
+            background-color: #1DA851;
+        }
+
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-modal.active {
+            display: flex;
+        }
+
+        .cart-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            color: #303030;
+        }
+
+        .cart-content h2 {
+            text-align: center;
+            color: #075E54;
+            margin-bottom: 20px;
+        }
+
+        .cart-items {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .cart-item p {
+            margin: 0;
+        }
+
+        .cart-total {
+            text-align: right;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .cart-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .cart-buttons button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 48%;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .cart-buttons .close-cart {
+            background-color: #ff3b30;
+        }
+
+        .cart-buttons .checkout {
+            background-color: #25D366;
+        }
+
+        .cart-buttons .close-cart:hover {
+            background-color: #e33228;
+        }
+
+        .cart-buttons .checkout:hover {
+            background-color: #1DA851;
+        }
+
+        .cart-form input,
+        .cart-form select,
+        .cart-form textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .cart-form label {
+            font-size: 16px;
+            color: #075E54;
+        }
+
+        @media (max-width: 600px) {
+            .product-card {
+                width: 90%;
+            }
+
+            .categories {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Botonera Smart Shop</h1>
+    </header>
+
+    <!-- Categorías -->
+    <div class="categories">
+        <div class="category active" data-category="frutas">Frutas y Verduras</div>
+        <div class="category" data-category="lacteos">Lácteos</div>
+        <div class="category" data-category="bebidas">Bebidas</div>
+        <div class="category" data-category="panaderia">Panadería</div>
+        <div class="category" data-category="carnes">Carnes</div>
+        <div class="category" data-category="aseo">Aseo Personal</div>
+        <div class="category" data-category="hogar">Hogar</div>
+        <div class="category" data-category="snacks">Snacks</div>
+    </div>
+
+    <!-- Productos -->
+
+    <!-- Frutas y Verduras -->
+    <div id="frutas" class="products active">
+        <!-- Producto 1 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/manzana.jpg" alt="Manzana">
+            <h3>Manzana Roja</h3>
+            <p>$2,000 / kg</p>
+            <input type="number" min="1" value="1" data-name="Manzana Roja" data-price="2000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 2 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/banano.jpg" alt="Banano">
+            <h3>Banano</h3>
+            <p>$1,500 / kg</p>
+            <input type="number" min="1" value="1" data-name="Banano" data-price="1500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 3 -->
+        <div class="product-card">
+            <img src="images/salsa-vegana-tocineta-360g-frontal-alimentos-delcasino.jpg" alt="Zanahoria">
+            <h3>Zanahoria</h3>
+            <p>$1,000 / kg</p>
+            <input type="number" min="1" value="1" data-name="Zanahoria" data-price="1000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 4 -->
+        <div class="product-card">
+            <img src="images/salsa-vegana-tocineta-900g-frontal-alimentos-delcasino.jpg" alt="Zanahoria">
+            <h3>Zanahoria</h3>
+            <p>$1,000 / kg</p>
+            <input type="number" min="1" value="1" data-name="Zanahoria" data-price="1000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Agrega más productos aquí -->
+    </div>
+
+    <!-- Lácteos -->
+    <div id="lacteos" class="products">
+        <!-- Producto 4 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/leche.jpg" alt="Leche">
+            <h3>Leche Entera</h3>
+            <p>$3,500 / litro</p>
+            <input type="number" min="1" value="1" data-name="Leche Entera" data-price="3500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 5 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/yogurt.jpg" alt="Yogurt">
+            <h3>Yogurt Natural</h3>
+            <p>$2,000 / unidad</p>
+            <input type="number" min="1" value="1" data-name="Yogurt Natural" data-price="2000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Agrega más productos aquí -->
+    </div>
+
+    <!-- Bebidas -->
+    <div id="bebidas" class="products">
+        <!-- Producto 6 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/jugo.jpg" alt="Jugo de Naranja">
+            <h3>Jugo de Naranja</h3>
+            <p>$2,500 / botella</p>
+            <input type="number" min="1" value="1" data-name="Jugo de Naranja" data-price="2500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 7 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/gaseosa.jpg" alt="Gaseosa">
+            <h3>Gaseosa Cola</h3>
+            <p>$3,000 / botella</p>
+            <input type="number" min="1" value="1" data-name="Gaseosa Cola" data-price="3000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Agrega más productos aquí -->
+    </div>
+
+    <!-- Panadería -->
+    <div id="panaderia" class="products">
+        <!-- Producto 8 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/pan_integral.jpg" alt="Pan Integral">
+            <h3>Pan Integral</h3>
+            <p>$3,000 / paquete</p>
+            <input type="number" min="1" value="1" data-name="Pan Integral" data-price="3000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 9 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/croissant.jpg" alt="Croissant">
+            <h3>Croissant</h3>
+            <p>$1,500 / unidad</p>
+            <input type="number" min="1" value="1" data-name="Croissant" data-price="1500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+    </div>
+
+    <!-- Carnes -->
+    <div id="carnes" class="products">
+        <!-- Producto 10 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/pollo.jpg" alt="Pollo">
+            <h3>Pechuga de Pollo</h3>
+            <p>$5,500 / kg</p>
+            <input type="number" min="1" value="1" data-name="Pechuga de Pollo" data-price="5500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 11 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/carne_res.jpg" alt="Carne de Res">
+            <h3>Carne de Res</h3>
+            <p>$7,800 / kg</p>
+            <input type="number" min="1" value="1" data-name="Carne de Res" data-price="7800">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+    </div>
+
+    <!-- Aseo Personal -->
+    <div id="aseo" class="products">
+        <!-- Producto 12 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/jabon.jpg" alt="Jabón">
+            <h3>Jabón de Tocador</h3>
+            <p>$1,500 / unidad</p>
+            <input type="number" min="1" value="1" data-name="Jabón de Tocador" data-price="1500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 13 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/shampoo.jpg" alt="Shampoo">
+            <h3>Shampoo</h3>
+            <p>$6,000 / unidad</p>
+            <input type="number" min="1" value="1" data-name="Shampoo" data-price="6000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+    </div>
+
+    <!-- Hogar -->
+    <div id="hogar" class="products">
+        <!-- Producto 14 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/detergente.jpg" alt="Detergente">
+            <h3>Detergente en Polvo</h3>
+            <p>$8,000 / paquete</p>
+            <input type="number" min="1" value="1" data-name="Detergente en Polvo" data-price="8000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 15 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/suavizante.jpg" alt="Suavizante">
+            <h3>Suavizante de Telas</h3>
+            <p>$7,000 / botella</p>
+            <input type="number" min="1" value="1" data-name="Suavizante de Telas" data-price="7000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+    </div>
+
+    <!-- Snacks -->
+    <div id="snacks" class="products">
+        <!-- Producto 16 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/papas.jpg" alt="Papas Fritas">
+            <h3>Papas Fritas</h3>
+            <p>$2,000 / paquete</p>
+            <input type="number" min="1" value="1" data-name="Papas Fritas" data-price="2000">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+        <!-- Producto 17 -->
+        <div class="product-card">
+            <img src="ruta_de_imagen/chocolate.jpg" alt="Chocolate">
+            <h3>Barra de Chocolate</h3>
+            <p>$2,500 / unidad</p>
+            <input type="number" min="1" value="1" data-name="Barra de Chocolate" data-price="2500">
+            <textarea placeholder="Comentarios adicionales" data-comment></textarea>
+            <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+    </div>
+
+    <!-- Carrito de compras -->
+    <div class="cart">🛒</div>
+
+    <!-- Modal del carrito -->
+    <div class="cart-modal">
+        <div class="cart-content">
+            <h2>Tu Carrito</h2>
+            <div class="cart-items">
+                <!-- Los ítems del carrito aparecerán aquí -->
+            </div>
+            <div class="cart-total">
+                <p>Total: $<span id="totalPrice">0</span> COP</p>
+            </div>
+
+            <!-- Formulario de datos del cliente -->
+            <form class="cart-form">
+                <label>Nombre del receptor:</label>
+                <input type="text" id="customerName" required>
+
+                <label>Dirección de entrega:</label>
+                <input type="text" id="customerAddress" required>
+
+                <label>Método de pago:</label>
+                <select id="paymentMethod" required>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Nequi">Nequi</option>
+                    <option value="Daviplata">Daviplata</option>
+                    <option value="Bancolombia">Bancolombia</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+
+                <label>¿Necesitas cambio?</label>
+                <select id="needChange" required>
+                    <option value="No">No</option>
+                    <option value="Sí">Sí</option>
+                </select>
+
+                <label>Comentarios adicionales:</label>
+                <textarea id="additionalComments" placeholder="Escribe aquí..."></textarea>
+            </form>
+
+            <div class="cart-buttons">
+                <button class="close-cart">Cerrar</button>
+                <button class="checkout">Enviar a WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script>
+        // Variables
+        const categories = document.querySelectorAll('.category');
+        const productsSections = document.querySelectorAll('.products');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        const cart = document.querySelector('.cart');
+        const cartModal = document.querySelector('.cart-modal');
+        const cartItemsContainer = document.querySelector('.cart-items');
+        const closeCartButton = document.querySelector('.close-cart');
+        const checkoutButton = document.querySelector('.checkout');
+        const totalPriceElement = document.getElementById('totalPrice');
+        const customerNameInput = document.getElementById('customerName');
+        const customerAddressInput = document.getElementById('customerAddress');
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        const needChangeSelect = document.getElementById('needChange');
+        const additionalCommentsInput = document.getElementById('additionalComments');
+        let cartItems = [];
+
+        // Mostrar productos de la categoría seleccionada
+        categories.forEach(category => {
+            category.addEventListener('click', () => {
+                categories.forEach(cat => cat.classList.remove('active'));
+                category.classList.add('active');
+                productsSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                const categoryName = category.getAttribute('data-category');
+                document.getElementById(categoryName).classList.add('active');
+            });
+        });
+
+        // Agregar producto al carrito
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productCard = button.parentElement;
+                const productName = productCard.querySelector('h3').innerText;
+                const productPrice = parseFloat(productCard.querySelector('input[type="number"]').getAttribute('data-price'));
+                const quantity = parseInt(productCard.querySelector('input[type="number"]').value);
+                const comment = productCard.querySelector('textarea[data-comment]').value.trim();
+
+                if (quantity <= 0 || isNaN(quantity)) {
+                    alert('Por favor, ingresa una cantidad válida.');
+                    return;
+                }
+
+                // Verificar si el producto ya está en el carrito
+                const existingItem = cartItems.find(item => item.name === productName && item.comment === comment);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cartItems.push({
+                        name: productName,
+                        price: productPrice,
+                        quantity: quantity,
+                        comment: comment
+                    });
+                }
+
+                alert('Producto agregado al carrito');
+            });
+        });
+
+        // Mostrar carrito
+        cart.addEventListener('click', () => {
+            updateCartModal();
+            cartModal.classList.add('active');
+        });
+
+        // Cerrar carrito
+        closeCartButton.addEventListener('click', () => {
+            cartModal.classList.remove('active');
+        });
+
+        // Actualizar modal del carrito
+        function updateCartModal() {
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+
+            cartItems.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                const cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                cartItem.innerHTML = `
+                    <p>${item.name} x${item.quantity} - $${itemTotal.toLocaleString('es-CO')} COP</p>
+                    ${item.comment ? `<p>Comentarios: ${item.comment}</p>` : ''}
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+
+            totalPriceElement.innerText = total.toLocaleString('es-CO');
+        }
+
+        // Enviar pedido a WhatsApp
+        checkoutButton.addEventListener('click', () => {
+            if (cartItems.length === 0) {
+                alert('Tu carrito está vacío.');
+                return;
+            }
+
+            if (!customerNameInput.value || !customerAddressInput.value) {
+                alert('Por favor, completa todos los campos requeridos.');
+                return;
+            }
+
+            let mensaje = `Hola, quisiera hacer el siguiente pedido:\n\n`;
+            let total = 0;
+
+            cartItems.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                mensaje += `${item.name} x${item.quantity} - $${itemTotal.toLocaleString('es-CO')} COP\n`;
+                if (item.comment) {
+                    mensaje += `Comentarios: ${item.comment}\n`;
+                }
+                mensaje += '\n';
+            });
+
+            mensaje += `Total a pagar: $${total.toLocaleString('es-CO')} COP\n\n`;
+            mensaje += `Nombre: ${customerNameInput.value}\n`;
+            mensaje += `Dirección: ${customerAddressInput.value}\n`;
+            mensaje += `Método de Pago: ${paymentMethodSelect.value}\n`;
+            mensaje += `¿Necesita cambio?: ${needChangeSelect.value}\n`;
+            if (additionalCommentsInput.value.trim()) {
+                mensaje += `Comentarios adicionales: ${additionalCommentsInput.value.trim()}\n`;
+            }
+
+            const numeroWhatsApp = 'TU_NUMERO_DE_WHATSAPP'; // Reemplaza con tu número
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${encodeURIComponent(mensaje)}`;
+
+            // Redirigir a WhatsApp
+            window.location.href = urlWhatsApp;
+        });
+    </script>
+
+</body>
+</html>
